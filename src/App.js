@@ -279,7 +279,7 @@ class App extends Component {
                       variant="raised"
                       color="secondary"
                       onClick={() =>
-                        this.reserveSeat(seatingChart, row - 1, seat - 1)
+                        this.reserveSeat(row - 1, seat - 1)
                       }
                     >
                       Reserve Seat
