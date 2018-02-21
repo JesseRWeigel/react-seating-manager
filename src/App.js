@@ -79,7 +79,7 @@ class App extends Component {
     this.setState({ seatNotAvailable: false })
     // Check to see if seat exists. Is seat open? Return true. Else, return false
     if (
-      row > 0 && column > 0 &&
+      row >= 0 && column >= 0 &&
       arr.length > row &&
       arr[row].length > column &&
       arr[row][column] === 0
@@ -137,7 +137,7 @@ class App extends Component {
                   seatNumbers,
                 ]
               } else if (seatNumbers.length > numOfSeats) {
-                const seatsToRemove = seatNumbers.length - numOfSeats
+
                 // Remove seats from seatNumbers array
                 seatNumbers.splice(0, 1)
 
