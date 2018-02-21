@@ -41,7 +41,10 @@ class App extends Component {
     seatingChart: [],
     showChart: false,
     rows: 0,
-    seatsPerRow: 0
+    seatsPerRow: 0,
+    seat: 0,
+    row: 0,
+    seatNotAvailable: false,
   }
 
   handleChange = name => event => {
@@ -68,9 +71,35 @@ class App extends Component {
       showChart: true,
     })
   }
+
+  reserveSeat = (arr, row, column) => {
+    this.setState({ seatNotAvailable: false })
+    // Check to see if seat exists. Is seat open? Return true. Else, return false
+    if (
+      arr.length > row &&
+      arr[row].length > column &&
+      arr[row][column] === 0
+    ) {
+      const newArr = arr
+      newArr[row][column] = 1
+      // seatsRemaining(newArr)
+      this.setState({ seatingChart: newArr })
+    } else {
+      this.setState({ seatNotAvailable: true })
+    }
+  }
+
   render() {
     const { classes } = this.props
-    const { seatingChart, showChart, rows, seatsPerRow } = this.state
+    const {
+      seatingChart,
+      showChart,
+      rows,
+      seatsPerRow,
+      seat,
+      row,
+      seatNotAvailable,
+    } = this.state
     return (
       <div className={classes.root}>
         <Grid container spacing={24}>
@@ -83,7 +112,7 @@ class App extends Component {
             <TextField
               id="rows"
               label="Rows"
-              value={this.state.rows}
+              value={rows}
               onChange={this.handleChange('rows')}
               type="number"
               className={classes.textField}
@@ -97,7 +126,7 @@ class App extends Component {
             <TextField
               id="seats-per-row"
               label="Seats per Row"
-              value={this.state.seatsPerRow}
+              value={seatsPerRow}
               onChange={this.handleChange('seatsPerRow')}
               type="number"
               className={classes.textField}
@@ -120,6 +149,50 @@ class App extends Component {
             {showChart &&
               seatingChart.length > 0 && (
                 <div className={classes.chartContainer}>
+                  <Grid item xs={12}>
+                    <Typography variant="display2" gutterBottom>
+                      Reserve a Seat
+                    </Typography>
+                    {seatNotAvailable && (
+                      <Typography variant="display2" gutterBottom>
+                        Sorry, that seat is already taken. Please select
+                        another.
+                      </Typography>
+                    )}
+                    <TextField
+                      id="row"
+                      label="Row"
+                      value={row}
+                      onChange={this.handleChange('row')}
+                      type="number"
+                      className={classes.textField}
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                      margin="normal"
+                    />
+                    <TextField
+                      id="seat"
+                      label="Seat"
+                      value={seat}
+                      onChange={this.handleChange('seat')}
+                      type="number"
+                      className={classes.textField}
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                      margin="normal"
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Button
+                      variant="raised"
+                      color="secondary"
+                      onClick={() => this.reserveSeat(seatingChart, row-1, seat-1)}
+                    >
+                      Reserve Seat
+                    </Button>
+                  </Grid>
                   {seatingChart.map((row, index) => (
                     <div className={classes.row} key={'r' + index}>
                       {row.map((seat, seatNum) => (
@@ -132,7 +205,6 @@ class App extends Component {
                 </div>
               )}
           </Grid>
-         
         </Grid>
       </div>
     )
