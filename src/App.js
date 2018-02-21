@@ -5,6 +5,7 @@ import withRoot from './withRoot'
 import Button from 'material-ui/Button'
 import TextField from 'material-ui/TextField'
 import Grid from 'material-ui/Grid'
+import Seat from './components/Seat'
 const distance = require('manhattan')
 
 const styles = theme => ({
@@ -20,20 +21,12 @@ const styles = theme => ({
   },
   chartContainer: {
     width: '100%',
-    backgroundColor: 'blue',
   },
   row: {
-    backgroundColor: 'purple',
-    width: '70%',
-    height: '35px',
-    margin: '0 auto',
-  },
-  seat: {
-    height: '20px',
-    width: '20px',
-    color: '#fff',
-    backgroundColor: 'green',
-    float: 'left',
+    margin: '8px',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 })
 
@@ -75,11 +68,19 @@ class App extends Component {
     })
   }
 
-  reserveSeat = (arr, row, column) => {
+  cancelReservation = (row, col) => {
+    let newChart = this.state.seatingChart
+    newChart[row][col] = 0
+    this.setState({ seatingChart: newChart })
+  }
+
+  reserveSeat = (row, column) => {
     this.setState({ seatNotAvailable: false })
+    let arr = this.state.seatingChart
     // Check to see if seat exists. Is seat open? Return true. Else, return false
     if (
-      row >= 0 && column >= 0 &&
+      row >= 0 &&
+      column >= 0 &&
       arr.length > row &&
       arr[row].length > column &&
       arr[row][column] === 0
@@ -137,7 +138,6 @@ class App extends Component {
                   seatNumbers,
                 ]
               } else if (seatNumbers.length > numOfSeats) {
-
                 // Remove seats from seatNumbers array
                 seatNumbers.splice(0, 1)
 
@@ -173,9 +173,7 @@ class App extends Component {
       const indexOfMinArrVal = manhattanTotalsArr.indexOf(minArrVal)
       const arrVal = potentialSeatCombinations[indexOfMinArrVal]
 
-      arrVal.map(item =>
-        this.reserveSeat(this.state.seatingChart, item.row, item.column)
-      )
+      arrVal.map(item => this.reserveSeat(item.row, item.column))
     }
   }
 
@@ -324,9 +322,13 @@ class App extends Component {
                   {seatingChart.map((row, index) => (
                     <div className={classes.row} key={'r' + index}>
                       {row.map((seat, seatNum) => (
-                        <div className={classes.seat} key={'s' + seatNum}>
-                          {seat}
-                        </div>
+                        <Seat
+                          row={index}
+                          col={seatNum}
+                          reserved={seat === 1 && true}
+                          cancel={this.cancelReservation}
+                          reserve={this.reserveSeat}
+                        />
                       ))}
                     </div>
                   ))}
