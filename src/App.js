@@ -5,6 +5,7 @@ import withRoot from './withRoot'
 import Button from 'material-ui/Button'
 import TextField from 'material-ui/TextField'
 import Grid from 'material-ui/Grid'
+const distance = require('manhattan')
 
 const styles = theme => ({
   root: {
@@ -45,6 +46,8 @@ class App extends Component {
     seat: 0,
     row: 0,
     seatNotAvailable: false,
+    seatsNotAvailable: false,
+    numOfSeats: 0,
   }
 
   handleChange = name => event => {
@@ -76,6 +79,7 @@ class App extends Component {
     this.setState({ seatNotAvailable: false })
     // Check to see if seat exists. Is seat open? Return true. Else, return false
     if (
+      row > 0 && column > 0 &&
       arr.length > row &&
       arr[row].length > column &&
       arr[row][column] === 0
@@ -89,6 +93,92 @@ class App extends Component {
     }
   }
 
+  reserveSeats = (arr, numOfSeats) => {
+    this.setState({ seatsNotAvailable: false })
+    // Find optimum seat (middle of row 1)
+    const optimumSeat = [0, Math.floor(arr[0].length / 2)]
+
+    let potentialSeatCombinations = []
+    // Reject requests for more than 10 seats
+    if (numOfSeats > 10) {
+      console.log('Sorry, no more than 10 seats can be reserved at one time.')
+    } else {
+      // Find contiguous seats closest to optimum seat
+      // Reject requests for more seats than one row can hold
+      for (let i = 0; i < arr.length; i++) {
+        let seatNumbers = []
+
+        if (arr[i].length < numOfSeats) {
+          console.log(
+            'Sorry, the rows are not long enough to accomidate that request.'
+          )
+        } else if (arr[i].filter(item => item === 0).length < numOfSeats) {
+          // Skip to next row if there are not enough available seats
+          console.log('Not enough open seats in row ' + (i + 1))
+        } else {
+          // Reject requests if there are not that many contiguous seats available
+          // loop over each row
+          // make an array of all the contiguous seats that are open, if there are none return false
+          // find manhattan distance of each of those seats
+          // return the group of seats with that distance
+          // Use the seatData scores to find sets of seats with the lowest score.
+          for (let j = 0; j < arr[i].length; j++) {
+            if (arr[i][j] === 1) {
+              // Clear seatNumbers array if this seat is already reserved
+              seatNumbers = []
+            } else {
+              // Save this seat to the seatNumbers array
+              seatNumbers = [...seatNumbers, { row: i, column: j }]
+
+              if (seatNumbers.length == numOfSeats) {
+                //Add seats to array of potential seat combinations
+                potentialSeatCombinations = [
+                  ...potentialSeatCombinations,
+                  seatNumbers,
+                ]
+              } else if (seatNumbers.length > numOfSeats) {
+                const seatsToRemove = seatNumbers.length - numOfSeats
+                // Remove seats from seatNumbers array
+                seatNumbers.splice(0, 1)
+
+                if (seatNumbers.length == numOfSeats) {
+                  //Add seats to array of potential seat combinations
+                  potentialSeatCombinations = [
+                    ...potentialSeatCombinations,
+                    seatNumbers,
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    if (potentialSeatCombinations.length === 0) {
+      this.setState({ seatsNotAvailable: true })
+    } else {
+      let manhattanTotalsArr = []
+      potentialSeatCombinations.map(item => {
+        let manhattanTotal = 0
+        item.map(
+          seat =>
+            (manhattanTotal =
+              manhattanTotal + distance(optimumSeat, [seat.row, seat.column]))
+        )
+        manhattanTotalsArr = [...manhattanTotalsArr, manhattanTotal]
+      })
+
+      const minArrVal = Math.min(...manhattanTotalsArr)
+      const indexOfMinArrVal = manhattanTotalsArr.indexOf(minArrVal)
+      const arrVal = potentialSeatCombinations[indexOfMinArrVal]
+
+      arrVal.map(item =>
+        this.reserveSeat(this.state.seatingChart, item.row, item.column)
+      )
+    }
+  }
+
   render() {
     const { classes } = this.props
     const {
@@ -99,12 +189,14 @@ class App extends Component {
       seat,
       row,
       seatNotAvailable,
+      seatsNotAvailable,
+      numOfSeats,
     } = this.state
     return (
       <div className={classes.root}>
         <Grid container spacing={24}>
           <Grid item xs={12}>
-            <Typography variant="display1" gutterBottom>
+            <Typography variant="display2" gutterBottom>
               React Seating Manager
             </Typography>
           </Grid>
@@ -150,12 +242,12 @@ class App extends Component {
               seatingChart.length > 0 && (
                 <div className={classes.chartContainer}>
                   <Grid item xs={12}>
-                    <Typography variant="display2" gutterBottom>
+                    <Typography variant="display1" gutterBottom>
                       Reserve a Seat
                     </Typography>
                     {seatNotAvailable && (
                       <Typography variant="display2" gutterBottom>
-                        Sorry, that seat is already taken. Please select
+                        Sorry, that seat is not available. Please select
                         another.
                       </Typography>
                     )}
@@ -188,9 +280,45 @@ class App extends Component {
                     <Button
                       variant="raised"
                       color="secondary"
-                      onClick={() => this.reserveSeat(seatingChart, row-1, seat-1)}
+                      onClick={() =>
+                        this.reserveSeat(seatingChart, row - 1, seat - 1)
+                      }
                     >
                       Reserve Seat
+                    </Button>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Typography variant="display1" gutterBottom>
+                      Or enter the number of seats you would like to reserve
+                    </Typography>
+                    {seatsNotAvailable && (
+                      <Typography variant="display2" gutterBottom>
+                        Sorry, we can't fulfill that request. Please try
+                        requesting two smaller sets of seats.
+                      </Typography>
+                    )}
+                    <TextField
+                      id="num-of-seats"
+                      label="Number of Seats"
+                      value={numOfSeats}
+                      onChange={this.handleChange('numOfSeats')}
+                      type="number"
+                      className={classes.textField}
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                      margin="normal"
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Button
+                      variant="raised"
+                      color="secondary"
+                      onClick={() =>
+                        this.reserveSeats(seatingChart, numOfSeats)
+                      }
+                    >
+                      Reserve Seats
                     </Button>
                   </Grid>
                   {seatingChart.map((row, index) => (

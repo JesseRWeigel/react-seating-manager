@@ -4168,6 +4168,10 @@ makeerror@1.0.x:
   dependencies:
     tmpl "1.0.x"
 
+manhattan@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/manhattan/-/manhattan-1.0.0.tgz#f1f2fd947231a195c6611409e6ef62930c809d68"
+
 map-obj@^1.0.0, map-obj@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/map-obj/-/map-obj-1.0.1.tgz#d933ceb9205d82bdcf4886f6742bdc2b4dea146d"
