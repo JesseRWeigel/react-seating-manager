@@ -1,6 +1,4 @@
-#React Seating Manager
-
-# bulletin-react
+# React Seating Manager
 [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
 A seating manager app inspired by the [ShowClix Interview Puzzle](https://www.showclix.com/static/puzzle.html) and built with [Create React App](https://github.com/facebookincubator/create-react-app) & [Material UI](https://github.com/callemall/material-ui). You can checkout the [my YouTube channel](https://www.youtube.com/c/JesseWeigel29) for live coding sessions & details of this project.
