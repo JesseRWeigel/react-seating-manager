@@ -1,5 +1,6 @@
 import React from 'react'
 import { withStyles } from 'material-ui/styles'
+import Paper from 'material-ui/Paper'
 
 const styles = theme => ({
   seat: {
@@ -7,7 +8,7 @@ const styles = theme => ({
     backgroundColor: 'green',
     padding: '8px',
     margin: '4px',
-    cursor: 'pointer'
+    cursor: 'pointer',
   },
   seatText: {
     display: 'block',
@@ -31,15 +32,15 @@ class Seat extends React.Component {
     const { classes, row, col, reserved } = this.props
 
     return (
-      <div
+      <Paper
         className={classes.seat}
         key={'s' + col + row}
         style={{ backgroundColor: `${reserved ? 'red' : 'green'}` }}
-        onClick={() => this.clickHandler(row,col)}
+        onClick={() => this.clickHandler(row, col)}
       >
         <span className={classes.seatText}>{`R${row + 1}`}</span>
         <span className={classes.seatText}>{`C${col + 1}`}</span>
-      </div>
+      </Paper>
     )
   }
 }

@@ -244,7 +244,7 @@ class App extends Component {
                       Reserve a Seat
                     </Typography>
                     {seatNotAvailable && (
-                      <Typography variant="display2" gutterBottom>
+                      <Typography variant="subheading" gutterBottom>
                         Sorry, that seat is not available. Please select
                         another.
                       </Typography>
@@ -286,11 +286,11 @@ class App extends Component {
                     </Button>
                   </Grid>
                   <Grid item xs={12}>
-                    <Typography variant="display1" gutterBottom>
+                    <Typography variant="headline" gutterBottom>
                       Or enter the number of seats you would like to reserve
                     </Typography>
                     {seatsNotAvailable && (
-                      <Typography variant="display2" gutterBottom>
+                      <Typography variant="subheading" gutterBottom>
                         Sorry, we can't fulfill that request. Please try
                         requesting two smaller sets of seats.
                       </Typography>
